@@ -111,7 +111,7 @@ class VideoCrowdDetector:
                     break
 
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                pred = self.model(rgb_frame, conf=conf, device=device, verbose=False)[0]
+                pred = self.model(rgb_frame, imgsz=1280, conf=conf, device=device, verbose=False)[0]
 
                 names = pred.names
                 boxes_class_id = pred.boxes.cls.cpu().numpy()
