@@ -14,8 +14,9 @@ class Plotter:
     Attributes:
         img (np.ndarray): The input image to plot.
         line_width (int): width of the bounding box lines.
-        tf (int): Thickness of the font text.
-        sf (float): Scale factor of the font text.
+        alpha (float): Transparency level for the label background.
+        font_thickness (int): Thickness of the font text.
+        font_scale (float): Scale factor of the font text.
 
     Methods:
         __init__: Initialize the Plotter object with image, line width and font size.
@@ -23,30 +24,35 @@ class Plotter:
         result: Returns plotted image as numpy array.
 
     Examples:
-        >>> plotter = Plotter(img, batch=32, vid_stride=1)
+        >>> plotter = Plotter(img)
         >>> for box, label in zip(boxes, labels):
         ...     plotter.plot_box(box, label)
         >>> plotter_image = plotter.result()
     """
     def __init__(self,
                  img: np.ndarray,
-                 line_width: Optional[int] = None) -> None:
+                 line_width: Optional[int] = None,
+                 alpha: float = 0.4
+                 ) -> None:
         """
         Initialize the Plotter object.
 
         Args:
             img (np.ndarray): Image array in BGR format.
             line_width (int, optional): Line thickness for plotting boxes.
+            alpha (float): Transparency level for the label background.
         """
         self.img = img
         self.line_width = line_width or max(round(sum(img.shape[:2]) / 1200), 1)
+        self.alpha = alpha
         self.font_thickness = max(self.line_width - 4, 1)
         self.font_scale = max(round(0.0005 * img.shape[0], 1), 0.7)
 
     def plot_box(self, bbox,
                  label: str = '',
                  color: Tuple[int, int, int] = (0, 0, 255),
-                 text_color: Tuple[int, int, int] = (255, 255, 255)) -> None:
+                 text_color: Tuple[int, int, int] = (255, 255, 255),
+                 ) -> None:
         """
         Plot a bounding box and optional label on the image.
 
@@ -80,7 +86,10 @@ class Plotter:
             rect_p1 = (p1[0], p1[1] - h if is_outside else p1[1])
             rect_p2 = (p1[0] + w, p1[1]) if is_outside else (p1[0] + w, p1[1] + h + 3)
 
-            cv2.rectangle(self.img, rect_p1, rect_p2, color, thickness=-1)
+            overlay = self.img.copy()
+            cv2.rectangle(overlay, rect_p1, rect_p2, color, thickness=-1)
+            cv2.addWeighted(overlay, self.alpha, self.img, 1 - self.alpha, 0, self.img)
+
             cv2.putText(
                 self.img,
                 label,
