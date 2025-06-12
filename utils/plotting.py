@@ -48,7 +48,8 @@ class Plotter:
         self.font_thickness = max(self.line_width - 4, 1)
         self.font_scale = max(round(0.0005 * img.shape[0], 1), 0.7)
 
-    def plot_box(self, bbox,
+    def plot_box(self,
+                 bbox,
                  label: str = '',
                  color: Tuple[int, int, int] = (0, 0, 255),
                  text_color: Tuple[int, int, int] = (255, 255, 255),
@@ -70,13 +71,15 @@ class Plotter:
                       p2,
                       color=color,
                       thickness=self.line_width,
-                      lineType=cv2.LINE_AA)
+                      lineType=cv2.LINE_AA
+                      )
 
         if label:
             (w, h), _ = cv2.getTextSize(label,
                                         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                                         fontScale=self.font_scale,
-                                        thickness=self.font_thickness)
+                                        thickness=self.font_thickness
+                                        )
             h += 3
             is_outside = p1[1] - h >= 0
             if p1[0] > self.img.shape[1] - w:
@@ -90,16 +93,15 @@ class Plotter:
             cv2.rectangle(overlay, rect_p1, rect_p2, color, thickness=-1)
             cv2.addWeighted(overlay, self.alpha, self.img, 1 - self.alpha, 0, self.img)
 
-            cv2.putText(
-                self.img,
-                label,
-                text_start_coord,
-                fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                fontScale=self.font_scale,
-                color=text_color,
-                thickness=self.font_thickness,
-                lineType=cv2.LINE_AA
-            )
+            cv2.putText(self.img,
+                        label,
+                        text_start_coord,
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=self.font_scale,
+                        color=text_color,
+                        thickness=self.font_thickness,
+                        lineType=cv2.LINE_AA
+                        )
 
     def result(self) -> np.ndarray:
         """
